@@ -11,7 +11,8 @@ app.listen(3001, () => {
 
 //configure mongoose
 mongoose.connect(
-  process.env.MONGODB_URI || "mongodb://localhost/nodejs-booking",
+  process.env.MONGO_URL || 'mongodb://mongo:27017/nodejs-booking',
+  // process.env.MONGODB_URI || "mongodb://localhost/nodejs-booking",
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,

@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    container_name: nodeApp
+    build: ./nodeApp
+    ports:
+      - "3000:3001"
+    volumes:
+      - ./seed:/usr/src/app/seed
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/nodejs-booking
+    depends_on:
+      - mongo
+
+  frontend:
+    container_name: angularApp
+    build: ./angularApp
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+  seed:
+    build: ./nodeApp
+    container_name: seedService
+    command: ["node", "seed/seed.js"]
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/nodejs-booking
+    volumes:
+      - ./nodeApp:/app
+      - /app/node_modules
+    entrypoint: ["sh", "-c", "sleep 5 && node seed/seed.js"]
+
+volumes:
+  mongo-data:
