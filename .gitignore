@@ -1,0 +1,16 @@
+# Node.js specific
+node_modules/
+npm-debug.log
+.env
+build/ # If you build your Node.js app into a 'build' folder
+
+# Angular specific
+angular-app/node_modules/
+angular-app/dist/ # The compiled output of your Angular app
+angular-app/.angular/cache
+angular-app/.vscode/ # If you have VS Code settings specific to the Angular app
+
+# Other common ignores
+.DS_Store # macOS specific
+.vscode/ # General VS Code settings if not specific to one app
+*.log
