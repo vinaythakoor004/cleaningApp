@@ -11,10 +11,12 @@ import { PopupService } from '../common/service/popup/popup.service';
 import { AlertService } from '../common/service/alert/alert.service';
 import { CommonService } from '../common/service/common/common.service';
 import { BubbleChartComponent } from './bubble-chart/bubble-chart.component';
-import { ScrollingModule } from '@angular/cdk/scrolling';
+// import { ScrollingModule } from '@angular/cdk/scrolling';
+import { WebsocketService } from './service/websocket.service';
+
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, SearchComponent, MatButtonModule, BubbleChartComponent, ScrollingModule ],
+  imports: [CommonModule, SearchComponent, MatButtonModule, BubbleChartComponent ], //ScrollingModule ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -30,7 +32,10 @@ export class HomeComponent implements OnInit {
   loggedInUser: any = {};
   public isLoading: boolean = true;
   public errorMessage: string | null = null;
-  constructor(private homeService: HomeService, private popupService: PopupService, private alertService: AlertService, private commonService: CommonService) { }
+  constructor(private homeService: HomeService, private popupService: PopupService,
+    private alertService: AlertService,
+    private ws: WebsocketService,
+    private commonService: CommonService) { }
 
   ngOnInit(): void {
     this.getServiceData();
@@ -43,6 +48,10 @@ export class HomeComponent implements OnInit {
     //     this.getPageData(1);
     //   }
     // })
+    this.ws.listenToBooking().subscribe(booking => {
+    alert('📢 New booking received:\n' + JSON.stringify(booking));
+    // or push to a bookings array if you're displaying a list
+  });
   }
 
   ngOnDestroy(): void {
