@@ -6,7 +6,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:4300",
+    origin: "http://frontend:4200",
     methods: ["GET", "POST"],
     credentials: true
   },

@@ -13,7 +13,7 @@ services:
     container_name: nodeApp
     build: ./nodeApp
     ports:
-      - "3000:3001"
+      - "3001:3001"
     volumes:
       - ./seed:/usr/src/app/seed
     environment:
@@ -25,7 +25,7 @@ services:
     container_name: angularApp
     build: ./angularApp
     ports:
-      - "4200:80"
+      - "4200:4200"
     depends_on:
       - backend
 

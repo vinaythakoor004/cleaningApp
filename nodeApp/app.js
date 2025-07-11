@@ -7,7 +7,7 @@ app.use(express.json());
 
 // MongoDB connection
 mongoose.connect(
-  process.env.MONGODB_URI || "mongodb://localhost/nodejs-booking",
+  process.env.MONGODB_URI || "mongodb://mongo:27017/nodejs-booking",
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
