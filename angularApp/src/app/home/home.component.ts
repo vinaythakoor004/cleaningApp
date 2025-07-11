@@ -107,7 +107,7 @@ export class HomeComponent implements OnInit {
   }
 
   identify(index: any, item: any) {
-    return item.id;
+    return item.bookingId;
   }
 
   openDetailsDialog(item: bookingData): void {
@@ -125,11 +125,11 @@ export class HomeComponent implements OnInit {
       selectdItem: item
     }
     this.popupService.openDialog(data, '30rem', 'custom-dialog-container', () => {
-      this.allBookingData = this.allBookingData.filter((data) => data.id !== item.id);
-      this.currentPage = this.bookingData.length == 1 && this.bookingData[0].id == item.id && this.currentPage != 1 ? this.currentPage - 1 : this.currentPage;
+      this.allBookingData = this.allBookingData.filter((data) => data.bookingId !== item.bookingId);
+      this.currentPage = this.bookingData.length == 1 && this.bookingData[0].bookingId == item.bookingId && this.currentPage != 1 ? this.currentPage - 1 : this.currentPage;
       this.getPageSize();
       this.getPageData(this.currentPage);
-      this.alertService.openSnackBar('Row: ' + item.id + ' deleted successfully');
+      this.alertService.openSnackBar('Row: ' + item.bookingId + ' deleted successfully');
     });
    }
 

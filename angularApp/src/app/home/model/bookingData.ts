@@ -1,10 +1,11 @@
 export class bookingData {
-    id: number;
+    _id?: string
+    bookingId: number;
     firstName: string;
     lastName: string;
     email: string;
     phone: string;
-    country: string;     
+    country: string;
     message: string;
     bookingDetails: {
         serviceName: string;
@@ -16,23 +17,24 @@ export class bookingData {
     }
 
     constructor(
-        id: number,
-        firstName: string,
-        lastName: string,
-        email: string,
-        phone: string,
-        country: string,
-        message: string,   
-        bookingDetails: {
-            serviceName: string;
-            bookingDateTime: string;
-            address: string;
-            price: string;
-            time: string;
-            slot: string;
-        }
+      bookingId: number,
+      firstName: string,
+      lastName: string,
+      email: string,
+      phone: string,
+      country: string,
+      message: string,
+      bookingDetails: {
+        serviceName: string;
+        bookingDateTime: string;
+        address: string;
+        price: string;
+        time: string;
+        slot: string;
+      },
+      _id?: string
     ) {
-        this.id = id;
+        this.bookingId = bookingId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -40,5 +42,6 @@ export class bookingData {
         this.country = country;
         this.message = message;
         this.bookingDetails = bookingDetails;
+        _id = _id;
     }
 }

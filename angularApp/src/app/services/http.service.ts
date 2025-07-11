@@ -36,6 +36,21 @@ export class HttpService {
     }
   }
 
+  put<T>(
+    url: string,
+    body?: T | null,
+    paramsObj?: HttpParams | undefined
+  ): Observable<any> {
+    if (isPlatformBrowser(this.platformId)) {
+      return this.http
+        .put<any>(url, body, { params: paramsObj })
+        .pipe(catchError(this.errorHandler));
+    } else {
+      return of(null);
+    }
+  }
+
+
   errorHandler(error: any): Observable<any> {
     return error;
   }

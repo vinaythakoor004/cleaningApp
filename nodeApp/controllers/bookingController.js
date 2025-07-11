@@ -18,13 +18,8 @@ exports.createMultipleBookings = async (req, res) => {
   }
 }
 
-exports.createBooking = async (req, res) => {
-  try {
-    const booking = await bookingService.createBooking(req.body);
-    res.json({ data: booking, status: "success" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+exports.createBooking = async (data) => {
+  return await bookingService.createBooking(data);
 };
 
 exports.getBookingById = async (req, res) => {

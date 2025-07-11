@@ -27,9 +27,9 @@ export class BookServiceComponent {
     image: 'default'
   };
 
-  constructor() { 
+  constructor() {
   }
-  
+
   ngOnInit(): void {
     if (this.bookService.serviceDetails.length) {
       this.getServiceDetails();
@@ -37,7 +37,7 @@ export class BookServiceComponent {
       this.router.navigate(['services']);
     }
   }
-  
+
   getServiceDetails(): void {
     this?.activatedRoute?.queryParams?.subscribe((params) => {
       const serviceName = params['name'];
