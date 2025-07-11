@@ -9,17 +9,24 @@ const {
 } = require("../controllers/bookingController");
 
 const router = express.Router();
-router.route("/").get(getAllBookings).post(createMultipleBookings).post(createBooking);
-router.route("/:id").get(getBookingById).put(updateBooking).delete(deleteBooking);
-router.post("/", async (req, res) => {
-  const booking = await Booking.create(req.body);
-  
-  const io = req.app.get("io");
-  if (io) {
-    io.emit("new-booking", booking);  // 🔥 Real-time emit
-  }
 
-  res.status(201).json(booking);
-});
+router.route("/")
+  .get(getAllBookings)
+  .post(async (req, res) => {
+    try {
+      const booking = await createBooking(req.body); // we’ll update this
+      const io = req.app.get("io");
+      if (io) io.emit("new-booking", booking);
+      res.status(201).json({ data: booking, status: "success" });
+    } catch (err) {
+      console.error("Booking creation failed:", err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+router.route("/:id")
+  .get(getBookingById)
+  .put(updateBooking)
+  .delete(deleteBooking);
 
 module.exports = router;

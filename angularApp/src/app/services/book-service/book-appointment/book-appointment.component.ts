@@ -83,10 +83,10 @@ export class BookAppointmentComponent {
   ngOnInit(): void {
     if (this.homeService.isEdit) {
       if (!this.bookService.serviceDetails.length) {
-        this.bookService.getServiceDetails().subscribe({
+        this.homeService.getServiceData().subscribe({
           next: (data) => {
             if (!this.allBookingData.length) {
-              this.allBookingData = this.homeService.allBookingDataCopy;              
+              this.allBookingData = this.homeService.allBookingDataCopy;
             }
             this.bookService.serviceDetails = data;
             this.setFormData(this.homeService.editItem);
@@ -100,7 +100,7 @@ export class BookAppointmentComponent {
       } else {
         this.setFormData(this.homeService.editItem);
         if (!this.allBookingData.length) {
-          this.allBookingData = this.homeService.allBookingDataCopy;              
+          this.allBookingData = this.homeService.allBookingDataCopy;
         }
       }
     }else if (this.bookService.serviceDetails.length) {
@@ -156,7 +156,7 @@ export class BookAppointmentComponent {
   onSubmit(): void {
     if (this.appointmentForm.valid) {
       const appointmentData: bookingData = {
-        id: this.homeService.isEdit ? this.homeService.editItem.id : this.allBookingData.length,
+        bookingId: this.homeService.isEdit ? this.homeService.editItem.id : this.allBookingData.length,
         firstName: this.appointmentForm.value.firstName,
         lastName: this.appointmentForm.value.lastName,
         email: this.appointmentForm.value.email,
@@ -172,28 +172,51 @@ export class BookAppointmentComponent {
           slot: this.appointmentForm.value.selectedSlot,
         },
       };
-      if (this.homeService.isEdit) {
-        this.updateBookingData(this.allBookingData, appointmentData);
-      } else {
-        this.allBookingData.unshift(appointmentData);
-      }
-      this.homeService.allBookingDataCopy = this.allBookingData;
-      this.alertService.openSnackBar('Appointment booked successfully!');
+      const id = this.homeService.isEdit ? this.homeService?.editItem?._id || null : null;
+      this.saveBooking(appointmentData, id);
       // this.homeService.bookingFormSubmitSubject.next(this.allBookingData);
-      console.log('Appointment booked successfully:', this.allBookingData);
+      // console.log('Appointment booked successfully:', this.allBookingData);
       // Perform further actions with the appointment data, such as sending it to a server
-      this.homeService.isEdit = false;
-      this.router.navigate(['home']);
     } else {
     }
   }
 
-  updateBookingData(allBookingData: Array<bookingData>, appointmentData: bookingData): void {
-    allBookingData.forEach((item, index) => {
-    if (item.id == appointmentData.id) {
-      allBookingData[index] = appointmentData;
+  saveBooking(appointmentData: bookingData, id?: string): void {
+    if (this.homeService.isEdit && id) {
+      this.updateBookingData(appointmentData, id);
+    } else {
+      this.postBooking(appointmentData);
     }
-    });
+  }
+
+  postBooking(appointmentData: bookingData): void {
+    this.homeService.postBooking(appointmentData).subscribe({
+      next: (data: any) => {
+        if (data) {
+          this.alertService.openSnackBar('Appointment booked successfully!');
+          this.homeService.isEdit = false;
+          this.router.navigate(['home']);
+        }
+      },
+      error: (err: any) => {
+        this.alertService.openSnackBar('Appointment booking failed!');
+      }
+    })
+  }
+
+  updateBookingData(appointmentData: bookingData, id: string): void {
+    this.homeService.updateBooking(appointmentData, id).subscribe({
+      next: (data: any) => {
+        if (data) {
+          this.alertService.openSnackBar('Appointment updated successfully!');
+          this.homeService.isEdit = false;
+          this.router.navigate(['home']);
+        }
+      },
+      error: (err: any) => {
+        this.alertService.openSnackBar('Appointment update failed!');
+      }
+    })
   }
 
   backBtnClick(): void {

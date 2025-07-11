@@ -8,9 +8,11 @@ exports.createMultipleBookings = async (bookings) => {
   return await BookingModel.insertMany(bookings);
 }
 
-exports.createBooking = async (booking) => {
-  return await BookingModel.create(booking);
+exports.createBooking = async (data) => {
+  const booking = await BookingModel.create(data);
+  return booking;
 };
+
 exports.getBookingById = async (id) => {
   return await BookingModel.findById(id);
 };
