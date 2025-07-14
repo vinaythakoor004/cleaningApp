@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, combineLatest, forkJoin, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { bookingData } from '../model/bookingData';
 import { HttpService } from '../../services/http.service';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -35,23 +36,15 @@ export class HomeService {
     );
   }
 
-  getServiceData(): Observable<any[]> {
-      return this.httpService.get<any[]>('/api/bookings').pipe(
-        map((bookings: any) => {
-          if (bookings?.data?.length) {
-            bookings.data.sort(
-              (a: bookingData, b: bookingData) =>
-                new Date(b.bookingDetails.bookingDateTime).getTime() -
-              new Date(a.bookingDetails.bookingDateTime).getTime()
-            );
-            this.allBookingDataCopy = bookings.data;
-            this.allBookingData = bookings.data;
-            return bookings.data;
-          } else {
-            return [];
-          }
-        })
-      );
+  getServiceData(pageNo: number, pageSize: number, search: string | ""): Observable<any[]> {
+      let params = new HttpParams()
+        .set('page', pageNo.toString())
+        .set('pageSize', pageSize.toString())
+
+      if (search && search.trim() !== '') {
+        params = params.set('search', search.trim());
+      }
+    return this.httpService.get<any[]>('/api/bookings', params)
   }
 
   postBooking(data: bookingData): Observable<bookingData | null> {
@@ -77,6 +70,20 @@ export class HomeService {
     return this.httpService.put("/api/bookings/" + id, data).pipe(
       catchError(err => {
         console.error('Booking POST failed:', err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  deleteBooking(id: String | undefined): Observable<any> {
+    if (!id) {
+      console.warn('No booking data provided');
+      return of(null);
+    }
+
+    return this.httpService.delete("/api/bookings/" + id).pipe(
+      catchError(err => {
+        console.error('Delete booking failed:', err);
         return throwError(() => err);
       })
     );

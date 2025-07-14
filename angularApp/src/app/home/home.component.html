@@ -20,7 +20,7 @@
       <thead>
         <tr>
           <th class="text-center" scope="col" title="Click on id to see user details"><span title="Click on id to see user details">#</span></th>
-          <th scope="col">Name 123</th>
+          <th scope="col">Name</th>
           <th scope="col">Service Name</th>
           <th scope="col">Time</th>
           <th scope="col">Price</th>
@@ -61,16 +61,16 @@
     <ul class="pagination">
       <li class="page-item">
         <a class="page-link" [class.disabled]="currentPage == 1" href="#" aria-label="Previous" aria-disabled=""
-          (click)="getPageData(currentPage - 1, $event)">
+          (click)="getPageData(currentPage - 1, $event, searchTxt)">
           <span aria-hidden="true">&laquo;</span>
         </a>
       </li>
       <li #pageNoElement *ngFor="let item of pageSize; let i = index;" class="page-item"><a #pageLink
-          [ngClass]="{ active: currentPage === i+1 }" (click)="getPageData(i+1, $event, pageNoElement)"
+          [ngClass]="{ active: currentPage === i+1 }" (click)="getPageData(i+1, $event, searchTxt)"
           class="page-link" href="#">{{i+1}}</a></li>
       <li class="page-item">
         <a class="page-link" [class.disabled]="currentPage == pageSize.length"
-          (click)="getPageData(currentPage + 1, $event)" href="#" aria-label="Next">
+          (click)="getPageData(currentPage + 1, $event, searchTxt)" href="#" aria-label="Next">
           <span aria-hidden="true">&raquo;</span>
         </a>
       </li>

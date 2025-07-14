@@ -26,6 +26,8 @@ export class HomeComponent implements OnInit {
   bookingData: Array<bookingData> = [];
   pageSize: Array<number> = [];
   currentPage: number = 1;
+  totalCount: number = 0;
+  searchTxt: string = "";
   readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
   subscriptions: Subscription | undefined;
@@ -38,16 +40,8 @@ export class HomeComponent implements OnInit {
     private commonService: CommonService) { }
 
   ngOnInit(): void {
-    this.getServiceData();
+    this.getServiceData(1);
     this.loggedInUser = this.commonService.loggedInUser;
-    // this.subscriptions = this.homeService.bookingFormSubmitSubject.subscribe((data: Array<bookingData>) => {
-    //   console.log(data);
-    //   if (data.length > 0) {
-    //     this.allBookingData = data;
-    //     this.getPageSize();
-    //     this.getPageData(1);
-    //   }
-    // })
     this.ws.listenToBooking().subscribe(booking => {
     alert('📢 New booking received:\n' + JSON.stringify(booking));
     // or push to a bookings array if you're displaying a list
@@ -58,21 +52,27 @@ export class HomeComponent implements OnInit {
     this.subscriptions?.unsubscribe();
   }
 
-  getServiceData(): void {
+  getServiceData(currentPage: number, searchTxt?: string): void {
     this.isLoading = true;
     this.errorMessage = null;
-    this.homeService.getServiceData().subscribe({
-      next: (data) => {
-        this.isLoading = false;
-        this.allBookingData = data;
-        this.getPageSize();
-        this.getPageData(1);
+    this.homeService.getServiceData(currentPage, 10, searchTxt || "").subscribe({
+      next: (data: any) => {
+        if (data?.bookings) {
+          this.isLoading = false;
+          this.allBookingData = data.bookings;
+          this.bookingData = data.bookings;
+          this.totalCount = data.total
+          this.getPageSize(this.totalCount);
+          // this.getPageData(currentPage);
+        }
       },
       error: (err) => {
         console.log(err)
         this.allBookingData = [];
-        this.getPageSize();
-        this.getPageData(1);
+        this.bookingData = [];
+        this.totalCount = 0
+        this.getPageSize(this.totalCount);
+        // this.getPageData(currentPage);
         this.errorMessage = 'Failed to load booking data. Please try again later.';
         this.isLoading = false;
       }
@@ -80,26 +80,29 @@ export class HomeComponent implements OnInit {
     )
   }
 
-  getPageSize(): Array<number> {
-    let limit = Math.ceil(this.allBookingData.length / 10);
+  getPageSize(total: number): Array<number> {
+    // let limit = Math.ceil(this.allBookingData.length / 10);
+    let limit = Math.ceil(total / 10);
     return this.pageSize = [...Array(limit)].map((a, i) => i + 1)
   }
 
-  getPageData(page: number, e?: any, pageNoElement?: any): void {
+  getPageData(page: number, e?: any, searchTxt?: any): void {
     this.currentPage = page;
     if (e) {
       e.preventDefault();
     }
-    let start = (page - 1) * 10;
-    let end = start + 10;
-    const newArr = this.allBookingData.slice(start, end);
-    this.bookingData = structuredClone(newArr);
+    // let start = (page - 1) * 10;
+    // let end = start + 10;
+    this.getServiceData(this.currentPage, searchTxt);
+    // const newArr = this.allBookingData.slice(start, end);
+    // this.bookingData = structuredClone(newArr);
   }
 
   getSearch(e: any): void {
-    this.allBookingData = e.allBookingData;
-    this.getPageData(1);
-    this.getPageSize();
+    // this.allBookingData = e.allBookingData;
+    this.searchTxt = e?.search || "";
+    this.getPageData(1, null, e?.search || "");
+    this.getPageSize(this.totalCount);
   }
 
   getPageClass(page: number): string {
@@ -125,13 +128,22 @@ export class HomeComponent implements OnInit {
       selectdItem: item
     }
     this.popupService.openDialog(data, '30rem', 'custom-dialog-container', () => {
-      this.allBookingData = this.allBookingData.filter((data) => data.bookingId !== item.bookingId);
-      this.currentPage = this.bookingData.length == 1 && this.bookingData[0].bookingId == item.bookingId && this.currentPage != 1 ? this.currentPage - 1 : this.currentPage;
-      this.getPageSize();
-      this.getPageData(this.currentPage);
-      this.alertService.openSnackBar('Row: ' + item.bookingId + ' deleted successfully');
+      this.deleteBooking(item);
     });
    }
+
+  deleteBooking(item: bookingData): void {
+    this.homeService.deleteBooking(item._id).subscribe({
+      next: (data: any) => {
+        this.currentPage = this.bookingData.length == 1 && this.bookingData[0].bookingId == item.bookingId && this.currentPage != 1 ? this.currentPage - 1 : this.currentPage;
+        this.getServiceData(this.currentPage);
+        this.alertService.openSnackBar('Row: ' + item.bookingId + ' deleted successfully');
+      },
+      error: (err: any) => {
+        this.alertService.openSnackBar('Delete booking failed!');
+      }
+    })
+  }
 
    editRow(item: bookingData): void {
     const data = {

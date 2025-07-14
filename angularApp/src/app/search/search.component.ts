@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, output, Output } from '@angular/core';
 import { bookingData } from '../home/model/bookingData';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-search',
@@ -11,6 +13,7 @@ export class SearchComponent {
   // @Input() allBookingData: Array<bookingData> = [];
   @Input() bookingData: Array<bookingData> = [];
   @Output() searchEvent = new EventEmitter<any>();
+  private searchSubject = new Subject<string>();
   allbookingDataCopy: Array<bookingData> = [];
   _allBookingData: Array<bookingData> = [];
 
@@ -22,26 +25,25 @@ export class SearchComponent {
     }
   }
 
-  get allBookingData(): any { 
+  get allBookingData(): any {
     console.log(this._allBookingData);
-    return this._allBookingData; 
+    return this._allBookingData;
   }
 
   ngOnInit() {
+    this.searchSubject.pipe(
+    debounceTime(600),
+    distinctUntilChanged(),
+    filter(value => !value || value.length >= 3) // allow empty or 3+ chars
+  ).subscribe(search => {
+    this.searchEvent.emit({ search }); // emit only after debounce + filter
+  });
     // this.allbookingDataCopy = structuredClone(this.allBookingData);
   }
 
   onInput(e: any): void {
     const val = e?.target?.value || e?.value || "";
-    if (val && this.allbookingDataCopy.length) {
-      this.allBookingData = this.allbookingDataCopy.filter((bookingData: bookingData) => {
-        return bookingData.firstName.toLowerCase().includes(val.toLowerCase()) || bookingData.lastName.toLowerCase().includes(val.toLowerCase()) || bookingData.country.toLowerCase().includes(val.toLowerCase())
-      || bookingData.bookingDetails.time.toLowerCase().includes(val.toLowerCase()) || bookingData.bookingDetails.serviceName.toLowerCase().includes(val.toLowerCase()) || bookingData.bookingDetails.price.toLowerCase().includes(val.toLowerCase());
-      });
-    } else {
-      this.allBookingData = this.allbookingDataCopy;
-    }
-    this.searchEvent.emit({ allBookingData: this.allBookingData });
+    this.searchSubject.next(val.trim());
   }
 
   searchClicked(e: any): void {
