@@ -29,18 +29,18 @@ services:
     depends_on:
       - backend
 
-  # seed:
-  #   build: ./nodeApp
-  #   container_name: seedService
-  #   command: ["node", "seed/seed.js"]
-  #   depends_on:
-  #     - mongo
-  #   environment:
-  #     - MONGO_URL=mongodb://mongo:27017/nodejs-booking
-  #   volumes:
-  #     - ./nodeApp:/app
-  #     - /app/node_modules
-  #   entrypoint: ["sh", "-c", "sleep 5 && node seed/seed.js"]
+  seed:
+    build: ./nodeApp
+    container_name: seedService
+    command: ["node", "seed/seed.js"]
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/nodejs-booking
+    volumes:
+      - ./nodeApp:/app
+      - /app/node_modules
+    entrypoint: ["sh", "-c", "sleep 5 && node seed/seed.js"]
 
 volumes:
   mongo-data:
