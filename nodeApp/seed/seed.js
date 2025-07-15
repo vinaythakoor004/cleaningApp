@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const Booking = require('../models/booking_data');
 
-const MONGO_URL = 'mongodb://localhost:27017/nodejs-booking';
+const MONGO_URL = 'mongodb://mongo:27017/nodejs-booking';
 
 async function seed() {
   try {
@@ -13,7 +13,8 @@ async function seed() {
     });
     console.log('✅ Connected to local MongoDB');
 
-    const data = JSON.parse(fs.readFileSync('./bookings.json', 'utf-8'));
+    // const data = JSON.parse(fs.readFileSync('/app/seed/bookings.json', 'utf-8'));
+    const data = JSON.parse(fs.readFileSync('/app/seed/bookings.json', 'utf-8'));
 
     await Booking.deleteMany({});
     console.log('🧹 Cleared existing bookings');

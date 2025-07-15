@@ -12,7 +12,7 @@ const bookingSchema = new Schema({
     message: String,
     bookingDetails: {
         serviceName: String,
-        bookingDateTime: Date,
+        bookingDateTime: { type: Date, required: true },
         address: String,
         time: String,
         price: String,

@@ -10,7 +10,7 @@ export class HttpService {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private http: HttpClient
-  ) {}
+  ) { }
 
   get<T>(url: string, paramsObj?: HttpParams | undefined): Observable<any> {
     if (isPlatformBrowser(this.platformId)) {
@@ -50,6 +50,19 @@ export class HttpService {
     }
   }
 
+  delete<T>(
+    url: string,
+    body?: T | null,
+    paramsObj?: HttpParams | undefined
+  ): Observable<any> {
+    if (isPlatformBrowser(this.platformId)) {
+      return this.http
+        .delete<any>(url)
+        .pipe(catchError(this.errorHandler));
+    } else {
+      return of(null);
+    }
+  }
 
   errorHandler(error: any): Observable<any> {
     return error;
